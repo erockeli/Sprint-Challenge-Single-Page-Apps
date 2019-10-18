@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
+import CharacterCard from "./CharacterCard";
+import axios from 'axios';
+import "../index.css";
+
 
 export default function CharacterList() {
   // TODO: Add useState to track data from useEffect
+  const [character, setcharacter]= useState([])
 
   useEffect(() => {
     // TODO: Add API Request here - must run in `useEffect`
