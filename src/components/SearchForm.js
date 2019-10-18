@@ -1,53 +1,65 @@
-import React, { useState } from "react";
-import CharacterCard from "./CharacterCard";
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {Link} from 'react-router-dom'
+import axios from 'axios'
+import styled from 'styled-components'
+
+
+const FormInput = styled.form`
+  text-align:center;
+  padding:15px;
+`
+
 
 export default function SearchForm(props) {
-
-  const [characters, setCharacters] = useState([]);
-  const [completeList, setCompleteList] = useState([]);
-    let changes = 0;
-
-  useEffect(() => {
-    // TODO: Add API Request here - must run in `useEffect`
-    //  Important: verify the 2nd `useEffect` parameter: the dependancies array!
-    axios.get("https://rickandmortyapi.com/api/character/").then(res => {
-      // setCharacters(res.data.results);
-      console.log(res.data.results);
-      setCharacters(res.data.results);
-      setCompleteList(res.data.results);
-    }).catch(e => console.log(e));
-  }, [changes]);
  
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const [searchResults, setSearchResults] = useState([])
+
+  useEffect( () => {
+    axios.get('https://rickandmortyapi.com/api/character/')
+    .then(response => {
+      const data = response.data.results
+      const results = data.filter(item => {
+        return item.name.toLowerCase().includes(searchTerm)
+      })
+      setSearchResults(results)
+    })
+    
+  },[searchTerm])
+
+  const handleChange = event => {
+    console.log(event.target.value)
+    setSearchTerm(event.target.value)
+  }
+
   return (
     <section className="search-form">
-     <form>
-        <label>
-        Search
-          <div>
-            <input
-              type="text"
-              name="search"
-              placeholder="Search for come content!"
-              // value={user.name}
-              onChange={event => handleChange(event)}
-            />
-          </div>
-        </label>
-      </form>
-      <div className="generic-list">
-      {characters.map(character => 
-          <CharacterCard
-            id={character.id}
-            name={character.name}
-            species={character.species}
-            image={character.image}
-            gender={character.gender}
-            status={character.status}
-          />   
-          )
-      }
-      </div>
+      <FormInput>
+      <input
+        type="text"
+        placeholder="Search"
+        name="textfield"
+        value={searchTerm}
+        onChange={handleChange}
+      />
+      </FormInput>
+      <ul>
+    {
+      searchResults.map(item => {
+        return (
+        <div key={item.id}>
+          <Link to={`/character/${item.id}`}>
+            <img src={item.image} alt="character profile" />
+            <h2>Name: {item.name}</h2>
+            <p>Species: {item.species}</p>
+            <p>Status:{item.status}</p>
+          </Link>
+        </div>
+        )
+      })
+    }
+      </ul>
     </section>
   );
 }
